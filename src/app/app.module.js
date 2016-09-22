@@ -13,6 +13,7 @@ var app_component_1 = require('./app.component');
 var menu_component_1 = require('./menu/menu.component');
 var races_component_1 = require('./races/races.component');
 var race_service_1 = require('./race.service');
+var race_component_1 = require('./race/race.component');
 var AppModule = (function () {
     function AppModule() {
     }
@@ -21,7 +22,8 @@ var AppModule = (function () {
             declarations: [
                 app_component_1.AppComponent,
                 menu_component_1.MenuComponent,
-                races_component_1.RacesComponent
+                races_component_1.RacesComponent,
+                race_component_1.RaceComponent
             ],
             imports: [
                 platform_browser_1.BrowserModule,
