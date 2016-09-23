@@ -1,6 +1,7 @@
-import { inject, TestBed } from '@angular/core/testing';
+import { async, inject, TestBed } from '@angular/core/testing';
 
 import { RaceService } from './race.service';
+import { RaceModel } from './models/race.model';
 
 describe('RaceService Service', () => {
 
@@ -12,9 +13,14 @@ describe('RaceService Service', () => {
 
   beforeEach(inject([RaceService], (s: RaceService) => service = s));
 
-  it('should list races', () => {
-    const races = service.list();
-    expect(races.length).toBe(2, 'The service should return two races for the `list()` method');
-  });
+  it('should list races', async(() => {
+    const observable = service.list();
+    observable.subscribe((races: Array<RaceModel>) => {
+      expect(races.length).toBe(2, 'The service should return two races');
+      const paris = races[0];
+      expect(paris.name).toBe('Paris');
+      expect(paris.ponies.length).toBe(5, 'The races should include the ponies');
+    });
+  }));
 
 });
