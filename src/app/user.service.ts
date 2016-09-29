@@ -10,4 +10,8 @@ export class UserService {
     const body = {login, password, birthYear};
     return this.http.post('http://ponyracer.ninja-squad.com/api/users', body).map(res => res.json());
   }
+
+  authenticate(credentials) {
+    return this.http.post('http://ponyracer.ninja-squad.com/api/users/authentication', credentials).map(res => res.json());
+  }
 }
