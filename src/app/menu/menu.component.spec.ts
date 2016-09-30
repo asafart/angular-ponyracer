@@ -1,17 +1,25 @@
-import { TestBed } from '@angular/core/testing';
+import { async, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Subject } from 'rxjs/Subject';
 
 import { AppModule } from '../app.module';
 import { MenuComponent } from './menu.component';
+import { UserService } from '../user.service';
+import { UserModel } from '../models/user.model';
 
 describe('Component: Menu', () => {
 
+  const fakeUserService = { userEvents: new Subject<UserModel>() } as UserService;
+
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [AppModule, RouterTestingModule]
+    imports: [AppModule, RouterTestingModule],
+    providers: [
+      { provide: UserService, useValue: fakeUserService }
+    ]
   }));
 
   it('should have a `navbarCollapsed` field', () => {
-    const menu: MenuComponent = new MenuComponent();
+    const menu: MenuComponent = new MenuComponent(fakeUserService);
     menu.ngOnInit();
     expect(menu.navbarCollapsed)
       .toBe(true, 'Check that `navbarCollapsed` is initialized with `true`.' +
@@ -19,7 +27,7 @@ describe('Component: Menu', () => {
   });
 
   it('should have a `toggleNavbar` method', () => {
-    const menu: MenuComponent = new MenuComponent();
+    const menu: MenuComponent = new MenuComponent(fakeUserService);
     expect(menu.toggleNavbar)
       .not.toBeNull('Maybe you forgot to declare a `toggleNavbar()` method');
 
@@ -63,5 +71,45 @@ describe('Component: Menu', () => {
 
     const links = element.querySelectorAll('a[routerLink]');
     expect(links.length).toBe(2, 'You should have two routerLink: one to the races, one to the home');
+  });
+
+  it('should listen to userEvents in ngOnInit', async(() => {
+    const component = new MenuComponent(fakeUserService);
+    component.ngOnInit();
+
+    const user = { login: 'cedric', money: 200 } as UserModel;
+
+    fakeUserService.userEvents.subscribe(() => {
+      expect(component.user).toBe(user, 'Your component should listen to the `userEvents` observable');
+    });
+
+    fakeUserService.userEvents.next(user);
+  }));
+
+  it('should display the user if logged', () => {
+    const fixture = TestBed.createComponent(MenuComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    component.user = { login: 'cedric', money: 200 } as UserModel;
+
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement;
+    const info = element.querySelectorAll('p');
+    expect(info.length).toBeGreaterThan(1, 'You should have two `p` elements to display the user info');
+    const name = info[0];
+    expect(name.textContent).toContain('cedric', 'You should display the user\'s name in a `p` element');
+    const money = info[1];
+    expect(money.textContent).toContain('200', 'You should display the user\'s score in a `p` element');
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const component = new MenuComponent(fakeUserService);
+    component.ngOnInit();
+    spyOn(component.userEventsSubscription, 'unsubscribe');
+    component.ngOnDestroy();
+
+    expect(component.userEventsSubscription.unsubscribe).toHaveBeenCalled();
   });
 });

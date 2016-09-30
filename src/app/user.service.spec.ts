@@ -61,9 +61,13 @@ describe('User Service', () => {
       connection.mockRespond(response);
     });
 
+    // spy on userEvents
+    spyOn(userService.userEvents, 'next');
+
     const credentials = { login: 'cedric', password: 'hello' };
     userService.authenticate(credentials).subscribe(res => {
       expect(res.id).toBe(1);
+      expect(userService.userEvents.next).toHaveBeenCalledWith(res);
     });
   }));
 });
