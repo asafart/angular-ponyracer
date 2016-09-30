@@ -16,6 +16,8 @@ import {HomeComponent} from './home/home.component';
 import {RegisterComponent} from './register/register.component';
 import {UserService} from './user.service';
 import { LoginComponent } from './login/login.component';
+import {HttpService} from './http.service';
+import { BetComponent } from './bet/bet.component';
 
 @NgModule({
     declarations: [
@@ -27,7 +29,8 @@ import { LoginComponent } from './login/login.component';
         FromNowPipe,
         HomeComponent,
         RegisterComponent,
-        LoginComponent
+        LoginComponent,
+        BetComponent
     ],
     imports: [
         BrowserModule,
@@ -38,7 +41,8 @@ import { LoginComponent } from './login/login.component';
     ],
     providers: [
         RaceService,
-        UserService
+        UserService,
+        HttpService
     ],
     bootstrap: [AppComponent]
 })

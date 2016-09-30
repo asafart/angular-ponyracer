@@ -1,3 +1,6 @@
-<div class="row" *ngFor="let race of races | slice:0:4">
-  <pr-race [raceModel]="race"></pr-race>
+<div *ngFor="let race of races | slice:0:4">
+  <div class="row">
+    <pr-race [raceModel]="race"></pr-race>
+  </div>
+  <a [routerLink]="['/bet', race.id]" class="btn btn-primary">Bet on {{race.name}}</a>
 </div>
