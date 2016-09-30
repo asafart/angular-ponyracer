@@ -9,7 +9,11 @@ import { UserModel } from '../models/user.model';
 
 describe('Component: Menu', () => {
 
-  const fakeUserService = { userEvents: new Subject<UserModel>() } as UserService;
+  const fakeUserService = {
+    userEvents: new Subject<UserModel>(),
+    logout: () => {}
+  } as UserService;
+  const fakeRouter = jasmine.createSpyObj('Router', ['navigate']);
 
   beforeEach(() => TestBed.configureTestingModule({
     imports: [AppModule, RouterTestingModule],
@@ -19,7 +23,7 @@ describe('Component: Menu', () => {
   }));
 
   it('should have a `navbarCollapsed` field', () => {
-    const menu: MenuComponent = new MenuComponent(fakeUserService);
+    const menu: MenuComponent = new MenuComponent(fakeUserService, fakeRouter);
     menu.ngOnInit();
     expect(menu.navbarCollapsed)
       .toBe(true, 'Check that `navbarCollapsed` is initialized with `true`.' +
@@ -27,7 +31,7 @@ describe('Component: Menu', () => {
   });
 
   it('should have a `toggleNavbar` method', () => {
-    const menu: MenuComponent = new MenuComponent(fakeUserService);
+    const menu: MenuComponent = new MenuComponent(fakeUserService, fakeRouter);
     expect(menu.toggleNavbar)
       .not.toBeNull('Maybe you forgot to declare a `toggleNavbar()` method');
 
@@ -74,7 +78,7 @@ describe('Component: Menu', () => {
   });
 
   it('should listen to userEvents in ngOnInit', async(() => {
-    const component = new MenuComponent(fakeUserService);
+    const component = new MenuComponent(fakeUserService, fakeRouter);
     component.ngOnInit();
 
     const user = { login: 'cedric', money: 200 } as UserModel;
@@ -105,11 +109,39 @@ describe('Component: Menu', () => {
   });
 
   it('should unsubscribe on destroy', () => {
-    const component = new MenuComponent(fakeUserService);
+    const component = new MenuComponent(fakeUserService, fakeRouter);
     component.ngOnInit();
     spyOn(component.userEventsSubscription, 'unsubscribe');
     component.ngOnDestroy();
 
     expect(component.userEventsSubscription.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should display a logout button', () => {
+    const fixture = TestBed.createComponent(MenuComponent);
+    const component = fixture.componentInstance;
+    component.user = { login: 'cedric', money: 200 } as UserModel;
+    fixture.detectChanges();
+    spyOn(fixture.componentInstance, 'logout');
+
+    const element = fixture.nativeElement;
+    const logout = element.querySelector('span.glyphicon-off');
+    expect(logout).not.toBeNull('You should have a span element with a class `glyphicon-off` to log out');
+    logout.dispatchEvent(new Event('click'));
+
+    fixture.detectChanges();
+    expect(fixture.componentInstance.logout).toHaveBeenCalled();
+  });
+
+  it('should stop the click event propagation', () => {
+    const component = new MenuComponent(fakeUserService, fakeRouter);
+    const event = new Event('click');
+    spyOn(fakeUserService, 'logout');
+    spyOn(event, 'preventDefault');
+    component.logout(event);
+
+    expect(fakeUserService.logout).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(fakeRouter.navigate).toHaveBeenCalledWith(['/']);
   });
 });
