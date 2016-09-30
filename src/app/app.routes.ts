@@ -5,12 +5,14 @@ import { RacesComponent } from './races/races.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { BetComponent } from './bet/bet.component';
+import { LiveComponent } from './live/live.component';
 
 export const ROUTES: Routes = [
     { path: '', component: HomeComponent },
     { path: 'races', component: RacesComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'login', component: LoginComponent },
-    { path: 'bet/:raceId', component: BetComponent }
+    { path: 'bet/:raceId', component: BetComponent },
+    { path: 'live/:raceId/:raceName', component: LiveComponent }
 ];
 
